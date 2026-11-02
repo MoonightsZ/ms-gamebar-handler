@@ -10,7 +10,7 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 .\scripts\build-msix.ps1
 ```
 
-輸出位於 `dist\msix\MsGamebarHandlerExtension_0.0.1.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。
+輸出位於 `dist\msix\MsGamebarHandlerExtension_0.0.2.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。
 
 ## 開發簽章
 
@@ -30,4 +30,4 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 4. 連接手把及按 Win+G，確認不再出現「選擇應用程式」對話框，並查看最近事件。
 5. 執行解除安裝，確認三個協議回到原有狀態。
 
-建置、簽章、套件內容、測試帳戶安裝與三協議 Shell 呼叫已驗證；使用者亦確認 Win+G／手把沒有彈窗，且可從 Command Palette 進入規則管理頁。CmdPal 各項表單與按鈕尚待逐項 UI 驗收。詳見 [驗收紀錄](TEST-RESULTS.md)。
+套件宣告 `unvirtualizedResources`，讓 CmdPal 寫入的引擎檔案、配置及三個 HKCU 協議命令可被套件外的 Windows Shell 存取。建置、簽章、套件內容、測試帳戶安裝與三協議 Shell 呼叫已驗證；使用者亦確認 Win+G／手把沒有彈窗，且可從 Command Palette 進入規則管理頁。CmdPal 各項表單與按鈕尚待逐項 UI 驗收。詳見 [驗收紀錄](TEST-RESULTS.md)。

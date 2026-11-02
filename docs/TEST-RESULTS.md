@@ -1,5 +1,12 @@
 # Windows 11 測試帳戶驗收紀錄（2026-11-02）
 
+## 0.0.2.0 修正驗證
+
+- 使用者回報：從 CmdPal 執行安裝時，`.NET` 主機提示無法解析 `%LOCALAPPDATA%\ms-gamebar-handler\bin\ms-gamebar-handler-cli.exe` 的完整路徑。
+- 檢查發現套件私有 `LocalCache\Local\ms-gamebar-handler\bin` 另有 CLI 副本；MSIX 對 AppData 的寫入虛擬化是差異來源。
+- 0.0.2.0 的清單已排除該資料目錄與三個 HKCU 協議機碼的虛擬化；MSIX 建置及簽章驗證通過，已更新安裝至測試帳戶。
+- 從新版 CmdPal 再次執行安裝並檢查實際路徑，仍待確認。
+
 ## 已驗證
 
 - `dotnet run --project tests/HandlerTests.csproj`：規則、冷卻、配置校驗與隔離登錄機碼測試通過。
