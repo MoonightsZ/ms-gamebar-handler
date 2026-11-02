@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "MsGamebarHandlerExtension (Package)": {
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": true
+    },
+    "MsGamebarHandlerExtension (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
