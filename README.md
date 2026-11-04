@@ -1,5 +1,7 @@
 # ms-gamebar-handler
 
+[更新日志](CHANGELOG.md)
+
 ![ms-gamebar-handler 图标](cmdpal-extension/MsGamebarHandlerExtension/Assets/Square150x150Logo.scale-200.png)
 
 让 Windows 接收游戏手柄或 `Win + G` 发出的 Game Bar 请求时，不再反复弹出“选择应用”窗口。安装后，这些请求默认被安静地忽略。项目通过 [PowerToys Command Palette](https://learn.microsoft.com/windows/powertoys/command-palette/overview) 提供操作入口。
