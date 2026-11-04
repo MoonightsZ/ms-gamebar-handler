@@ -10,9 +10,11 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 .\scripts\build-msix.ps1
 ```
 
-輸出位於 `dist\msix\MsGamebarHandlerExtension_0.7.0.0_x64_Test\`。檔名沿用專案名稱，但包內身分是 `Moonights.ms-gamebar-handler`。其中未簽章的 `.msix` 可提交到 Microsoft Store；不要把它當作一般使用者的直接下載安裝包。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette` 及三個 `windows.protocol`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
+輸出位於 `dist\msix\MsGamebarHandlerExtension_0.8.0.0_x64_Test\`。檔名沿用專案名稱，但包內身分是 `Moonights.ms-gamebar-handler`。其中未簽章的 `.msix` 可提交到 Microsoft Store；不要把它當作一般使用者的直接下載安裝包。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette` 及三個 `windows.protocol`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
 
 ## Microsoft Store 提交
+
+0.8.0.0 的單一 x64 MSIX 同時包含 `zh-CN`、`zh-TW`、`en-US` 資源；`zh-CN` 是預設回退語言。建置後應檢查包內 `AppxManifest.xml` 的 `<Resources>` 有三個語言，且 `resources.pri` 含三組應用名稱與說明。三種語言的商店頁面仍需在 Partner Center 分別填寫，文案草稿見 [STORE-LISTING.md](STORE-LISTING.md)。
 
 Partner Center 已保留產品 `9P2LHK1M4M0G`。清單使用商店分配的 `Identity Name="Moonights.ms-gamebar-handler"`、`Publisher="CN=A70DFBBD-5B3C-41A7-BF72-66C10479A4CD"` 和顯示名稱 `Moonights`；預期 PFN 為 `Moonights.ms-gamebar-handler_7btbqs5mh4z4t`。提交前請核對建置產物內的 `AppxManifest.xml` 與這些值一致，並在 Partner Center 對應產品的「套件」頁上傳未簽章的 `.msix`。商店通過認證後會以微軟憑證重新簽章；使用者從商店安裝無需匯入開發憑證。參見[微軟的 MSIX 上傳說明](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/upload-app-packages)和[套件簽章說明](https://learn.microsoft.com/en-us/windows/apps/publish/publish-your-app/msix/app-certification-process)。
 
@@ -33,7 +35,7 @@ PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal �
 同一個 Windows 帳戶安裝較高版本時，直接執行 `Add-AppxPackage` 即可升級，毋須先解除安裝。升級要求新舊 MSIX 的套件家族名稱一致；從 0.7.0.0 起需維持新的商店 Name、Publisher，並提高 `Version`。**0.5.0 及更早的測試包使用舊套件家族，不能原地升級到商店版。**首次改用 0.7.0.0 或商店版前，先從 Windows「已安裝的應用」解除安裝舊測試包；使用者設定和事件紀錄保存在 `%LOCALAPPDATA%\ms-gamebar-handler`，卸載 MSIX 不會主動刪除它們。參見 [Add-AppxPackage 官方說明](https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage)。
 
 ```powershell
-$package = 'C:\path\to\MsGamebarHandlerExtension_0.7.0.0_x64.msix'
+$package = 'C:\path\to\MsGamebarHandlerExtension_0.8.0.0_x64.msix'
 Add-AppxPackage -Path $package -ForceApplicationShutdown
 Get-AppxPackage -Name Moonights.ms-gamebar-handler |
     Select-Object Name, PackageFamilyName, Version, PackageFullName

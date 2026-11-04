@@ -4,6 +4,7 @@
 
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using MsGamebarHandler;
 
 namespace MsGamebarHandlerExtension;
 
@@ -12,17 +13,17 @@ internal sealed partial class MsGamebarHandlerExtensionPage : ListPage
     public MsGamebarHandlerExtensionPage()
     {
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
-        Title = "ms-gamebar-handler";
-        Name = "管理 Game Bar 協議";
+        Title = L.Get("AppName");
+        Name = L.Get("ManageProtocols");
     }
 
     public override IListItem[] GetItems()
     {
         return
         [
-            new ListItem(new HandlerAction("安裝管理工具", HandlerOperations.Install)) { Title = "安裝管理工具", Subtitle = "複製命令列工具並初始化配置" },
-            new ListItem(new HandlerAction("還原舊版手動註冊", HandlerOperations.RestoreLegacyRegistration)) { Title = "還原舊版手動註冊", Subtitle = "清理舊版登錄設定；不會移除 MSIX" },
-            new ListItem(new RecentEventsPage()) { Title = "最近事件" },
+            new ListItem(new HandlerAction(L.Get("InstallTools"), HandlerOperations.Install)) { Title = L.Get("InstallTools"), Subtitle = L.Get("InstallToolsDescription") },
+            new ListItem(new HandlerAction(L.Get("RestoreLegacy"), HandlerOperations.RestoreLegacyRegistration)) { Title = L.Get("RestoreLegacy"), Subtitle = L.Get("RestoreLegacyDescription") },
+            new ListItem(new RecentEventsPage()) { Title = L.Get("RecentEvents") },
         ];
     }
 }

@@ -22,13 +22,13 @@ public sealed class HandlerConfig
     public static HandlerConfig Load(string path)
     {
         if (!File.Exists(path)) return Default();
-        var result = JsonSerializer.Deserialize<HandlerConfig>(File.ReadAllText(path), JsonOptions) ?? throw new InvalidDataException("配置為空");
-        if (result.Version != 1 || result.Events is null || result.DefaultAction is null || result.AllowedExecutables is null) throw new InvalidDataException("配置版本或欄位無效");
+        var result = JsonSerializer.Deserialize<HandlerConfig>(File.ReadAllText(path), JsonOptions) ?? throw new InvalidDataException(L.Get("EmptyConfig"));
+        if (result.Version != 1 || result.Events is null || result.DefaultAction is null || result.AllowedExecutables is null) throw new InvalidDataException(L.Get("InvalidConfig"));
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var rule in result.Events)
         {
             RuleEditor.Validate(rule, result);
-            if (!ids.Add(rule.Id)) throw new InvalidDataException($"重複的規則 ID：{rule.Id}");
+            if (!ids.Add(rule.Id)) throw new InvalidDataException(L.Get("DuplicateRule", rule.Id));
         }
         ValidateAction(result.DefaultAction, result.AllowRun, result.AllowedExecutables);
         return result;
@@ -41,7 +41,7 @@ public sealed class HandlerConfig
         if (action.Type == "launch-uri" && Uri.TryCreate(action.Value, UriKind.Absolute, out var uri) && !Protocols.Names.Contains(uri.Scheme, StringComparer.OrdinalIgnoreCase)) return;
         if (action.Type == "run" && allowRun && Path.IsPathFullyQualified(action.Value) && File.Exists(action.Value)
             && allowedExecutables?.Contains(action.Value, StringComparer.OrdinalIgnoreCase) == true) return;
-        throw new InvalidDataException($"無效或未允許的動作：{action.Type}");
+        throw new InvalidDataException(L.Get("InvalidAction", action.Type));
     }
 
     public static JsonSerializerOptions JsonOptions { get; } = new() { PropertyNameCaseInsensitive = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };

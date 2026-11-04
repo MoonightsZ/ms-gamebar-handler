@@ -2,6 +2,7 @@
 **/obj/
 dist/
 **/AppPackages/
+**/BundleArtifacts/
 *.msix
 *.msixbundle
 *.user

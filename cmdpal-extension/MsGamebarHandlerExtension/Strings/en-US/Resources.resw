@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppDisplayName" xml:space="preserve"><value>MS Game Bar Handler</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>Handles Game Bar protocol requests without repeated app selection prompts.</value></data>
+</root>

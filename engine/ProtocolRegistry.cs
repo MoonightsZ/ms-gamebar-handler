@@ -15,14 +15,14 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
         foreach (var name in Protocols.Names)
         {
             using var key = Registry.CurrentUser.OpenSubKey($@"{classesRoot}\{name}\shell\open\command");
-            yield return $"{name}: {key?.GetValue("") ?? "(未註冊)"}";
+            yield return $"{name}: {key?.GetValue("") ?? $"({L.Get("NotRegistered")})"}";
         }
     }
 
     public void Register(string executable)
     {
         if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException();
-        if (!File.Exists(executable)) throw new FileNotFoundException("找不到引擎", executable);
+        if (!File.Exists(executable)) throw new FileNotFoundException(L.Get("EngineMissing"), executable);
         Directory.CreateDirectory(dataDirectory);
         var command = $"\"{executable}\" --invoke \"%1\"";
         List<RegistrySnapshot> backup;
@@ -30,12 +30,12 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
         {
             backup = ReadBackup();
             if (backup.Any(s => s.InstalledCommand != command))
-                throw new InvalidOperationException("處理程式路徑已改變；請先由原安裝位置解除註冊");
+                throw new InvalidOperationException(L.Get("PathChanged"));
             foreach (var name in Protocols.Names)
             {
                 var current = ReadCommand(name);
                 if (current is not null && !backup.Any(s => s.Name == name && s.InstalledCommand == current))
-                    throw new InvalidOperationException($"{name} 已由其他程式接管");
+                    throw new InvalidOperationException(L.Get("ProtocolClaimed", name));
             }
         }
         else
@@ -45,14 +45,14 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
             foreach (var name in Protocols.Names)
             {
                 using var commandKey = Registry.CurrentUser.OpenSubKey($@"{classesRoot}\{name}\shell\open\command");
-                if (commandKey is not null) throw new InvalidOperationException($"{name} 已有命令鍵，拒絕覆寫");
+                if (commandKey is not null) throw new InvalidOperationException(L.Get("ProtocolCommandExists", name));
                 if (classesRoot == @"Software\Classes")
                 {
                     using var effective = Registry.ClassesRoot.OpenSubKey($@"{name}\shell\open\command");
-                    if (effective is not null) throw new InvalidOperationException($"{name} 已有系統處理程式，拒絕覆寫");
+                    if (effective is not null) throw new InvalidOperationException(L.Get("ProtocolSystemHandlerExists", name));
                 }
                 var existing = ReadCommand(name);
-                if (existing is not null) throw new InvalidOperationException($"{name} 已有處理程式，拒絕覆寫");
+                if (existing is not null) throw new InvalidOperationException(L.Get("ProtocolHandlerExists", name));
                 using var key = Registry.CurrentUser.OpenSubKey($@"{classesRoot}\{name}");
                 backup.Add(new RegistrySnapshot(name, key is not null, key?.GetValueNames().Contains("URL Protocol") == true, key?.GetValue("URL Protocol")?.ToString(), existing, command));
             }
@@ -72,7 +72,7 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
 
     public void Unregister()
     {
-        if (!File.Exists(BackupPath)) throw new InvalidOperationException("找不到原始註冊備份，拒絕解除註冊");
+        if (!File.Exists(BackupPath)) throw new InvalidOperationException(L.Get("BackupMissing"));
         var backup = ReadBackup();
         // 若使用者或其他程式已改動命令，停止還原，避免刪掉別人的設定。
         foreach (var item in backup)
@@ -81,7 +81,7 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
             if (current == item.InstalledCommand) continue;
             using var commandKey = Registry.CurrentUser.OpenSubKey($@"{classesRoot}\{item.Name}\shell\open\command");
             if (current is not null || commandKey is not null || item.CommandValue is not null)
-                throw new InvalidOperationException($"{item.Name} 已被其他程式修改，拒絕還原");
+                throw new InvalidOperationException(L.Get("ProtocolChanged", item.Name));
         }
 
         foreach (var item in backup)
@@ -126,7 +126,7 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
     {
         var value = JsonSerializer.Deserialize<List<RegistrySnapshot>>(File.ReadAllText(BackupPath), HandlerConfig.JsonOptions);
         if (value?.Count != Protocols.Names.Length || value.Any(s => !Protocols.Names.Contains(s.Name)))
-            throw new InvalidDataException("註冊備份無效");
+            throw new InvalidDataException(L.Get("InvalidBackup"));
         return value;
     }
 }

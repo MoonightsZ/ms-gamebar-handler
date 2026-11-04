@@ -13,10 +13,10 @@
   <Identity
     Name="Moonights.ms-gamebar-handler"
     Publisher="CN=A70DFBBD-5B3C-41A7-BF72-66C10479A4CD"
-    Version="0.7.0.0" />
+    Version="0.8.0.0" />
 
   <Properties>
-    <DisplayName>ms-gamebar-handler</DisplayName>
+    <DisplayName>ms-resource:AppDisplayName</DisplayName>
     <PublisherDisplayName>Moonights</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
@@ -41,7 +41,9 @@
   </Dependencies>
 
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="zh-CN" />
+    <Resource Language="zh-TW" />
+    <Resource Language="en-US" />
   </Resources>
 
   <Applications>
@@ -50,8 +52,8 @@
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         AppListEntry="none"
-        DisplayName="ms-gamebar-handler"
-        Description="ms-gamebar-handler"
+        DisplayName="ms-resource:AppDisplayName"
+        Description="ms-resource:AppDescription"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
@@ -80,8 +82,8 @@
           <uap3:AppExtension Name="com.microsoft.commandpalette"
             Id="MsGamebarHandler.Extension"
             PublicFolder="Public"
-            DisplayName="ms-gamebar-handler"
-            Description="ms-gamebar-handler">
+            DisplayName="ms-resource:AppDisplayName"
+            Description="ms-resource:AppDescription">
             <uap3:Properties>
               <CmdPalProvider>
                 <Activation>

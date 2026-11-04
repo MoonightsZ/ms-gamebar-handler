@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.Json.Nodes;
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using MsGamebarHandler;
 
 namespace MsGamebarHandlerExtension;
 
@@ -11,7 +12,7 @@ internal sealed partial class HandlerAction(string title, Func<string> action) :
     public override ICommandResult Invoke()
     {
         try { return CommandResult.ShowToast(action()); }
-        catch (Exception ex) { return CommandResult.ShowToast($"{title}失敗：{ex.Message}"); }
+        catch (Exception ex) { return CommandResult.ShowToast(L.Get("ActionFailed", title, ex.Message)); }
     }
 }
 
@@ -39,26 +40,26 @@ internal static class HandlerOperations
         foreach (var name in new[] { "ms-gamebar-handler.exe", "ms-gamebar-handler-cli.exe" })
         {
             var source = Path.Combine(AppContext.BaseDirectory, "Payload", name);
-            if (!File.Exists(source)) throw new FileNotFoundException("套件未包含引擎", source);
+            if (!File.Exists(source)) throw new FileNotFoundException(L.Get("MissingEngine"), source);
             File.Copy(source, Path.Combine(Bin, name), true);
         }
         RunCli("--init");
-        return "管理工具已安裝；MSIX 已接管三個 Game Bar 協議";
+        return L.Get("ToolsInstalled");
     }
 
     public static string RestoreLegacyRegistration()
     {
         // 清除舊版手動登錄不會移除 MSIX。要停止接管協議須從 Windows 設定卸載套件。
-        if (!File.Exists(Path.Combine(Data, "registry-backup.json"))) return "沒有舊版手動註冊需要還原";
+        if (!File.Exists(Path.Combine(Data, "registry-backup.json"))) return L.Get("NoLegacyRegistration");
         RunCli("--unregister");
-        return "已還原舊版手動註冊；MSIX 仍在處理協議";
+        return L.Get("LegacyRestored");
     }
 
     public static IReadOnlyList<RuleView> ReadRules()
     {
         if (!File.Exists(Config)) return [];
-        var root = JsonNode.Parse(File.ReadAllText(Config)) ?? throw new InvalidDataException("配置為空");
-        var events = root["events"]?.AsArray() ?? throw new InvalidDataException("缺少 events 欄位");
+        var root = JsonNode.Parse(File.ReadAllText(Config)) ?? throw new InvalidDataException(L.Get("EmptyConfig"));
+        var events = root["events"]?.AsArray() ?? throw new InvalidDataException(L.Get("MissingEvents"));
         return events.Select(item => new RuleView(
             item?["id"]?.ToString() ?? "",
             bool.TryParse(item?["enabled"]?.ToString(), out var enabled) && enabled,
@@ -78,15 +79,15 @@ internal static class HandlerOperations
     private static string RunCli(params string[] arguments)
     {
         // 使用 ArgumentList 傳參數，避免自己拼接命令列時把引號或空白處理錯。
-        if (!File.Exists(Cli)) throw new FileNotFoundException("尚未安裝管理工具", Cli);
+        if (!File.Exists(Cli)) throw new FileNotFoundException(L.Get("ToolsNotInstalled"), Cli);
         var start = new ProcessStartInfo(Cli) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardError = true, RedirectStandardOutput = true };
         foreach (var argument in arguments) start.ArgumentList.Add(argument);
         using var process = Process.Start(start);
-        if (process is null) throw new InvalidOperationException("無法啟動管理工具");
+        if (process is null) throw new InvalidOperationException(L.Get("CliStartFailed"));
         var error = process.StandardError.ReadToEnd();
         var output = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        if (process.ExitCode != 0) throw new InvalidOperationException(string.IsNullOrWhiteSpace(error) ? "管理工具回報錯誤" : error.Trim());
+        if (process.ExitCode != 0) throw new InvalidOperationException(string.IsNullOrWhiteSpace(error) ? L.Get("CliFailed") : error.Trim());
         return output.Trim();
     }
 }

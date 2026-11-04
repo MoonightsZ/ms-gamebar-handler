@@ -2,7 +2,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>MsGamebarHandlerExtension</RootNamespace>
-    <AppxPackageVersion>0.7.0.0</AppxPackageVersion>
+    <AppxPackageVersion>0.8.0.0</AppxPackageVersion>
+    <DefaultLanguage>zh-CN</DefaultLanguage>
+    <AppxBundle>Never</AppxBundle>
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
     <WindowsSdkPackageVersion>10.0.26100.68-preview</WindowsSdkPackageVersion>
@@ -20,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="../../engine/Localization.cs" Link="Localization.cs" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />

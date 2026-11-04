@@ -1,4 +1,5 @@
 using MsGamebarHandler;
+using System.Globalization;
 
 var failures = 0;
 void Check(string name, bool okay)
@@ -8,6 +9,12 @@ void Check(string name, bool okay)
 }
 
 var config = HandlerConfig.Default();
+Check("簡體中文為預設語言", L.ForCulture("InstallTools", CultureInfo.GetCultureInfo("fr-FR")) == "安装管理工具");
+Check("繁體中文翻譯", L.ForCulture("InstallTools", CultureInfo.GetCultureInfo("zh-TW")) == "安裝管理工具");
+Check("英文翻譯", L.ForCulture("InstallTools", CultureInfo.GetCultureInfo("en-US")) == "Install management tools");
+Check("三語應用名稱", L.ForCulture("AppName", CultureInfo.GetCultureInfo("zh-CN")) == "MS 游戏栏处理器"
+    && L.ForCulture("AppName", CultureInfo.GetCultureInfo("zh-TW")) == "MS 遊戲列處理器"
+    && L.ForCulture("AppName", CultureInfo.GetCultureInfo("en-US")) == "MS Game Bar Handler");
 Check("預設忽略", config.DefaultAction.Type == "ignore");
 Check("首版沒有預設規則", config.Events.Count == 0);
 Check("支援三個協議", Protocols.IsSupported("ms-gamebar://gamepadConnect/") && Protocols.IsSupported("ms-gamingoverlay:") && Protocols.IsSupported("ms-gamebarservices:"));
@@ -39,7 +46,7 @@ try
     using (var root = Microsoft.Win32.Registry.CurrentUser.OpenSubKey($@"{testRoot}\ms-gamingoverlay", true))
         root!.DeleteSubKey(@"shell\open\command");
     registry.Unregister();
-    Check("部分註冊後仍可還原", registry.Status().All(s => s.Contains("未註冊")));
+    Check("部分註冊後仍可還原", registry.Status().All(s => s.Contains($"({L.Get("NotRegistered")})")));
     using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey($@"{testRoot}\ms-gamebar"))
         Check("保留原有協議值", key?.GetValue("URL Protocol")?.ToString() == "original");
     Check("移除新建的協議鍵", Microsoft.Win32.Registry.CurrentUser.OpenSubKey($@"{testRoot}\ms-gamingoverlay") is null);

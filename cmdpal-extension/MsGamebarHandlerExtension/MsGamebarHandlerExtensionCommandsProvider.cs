@@ -4,6 +4,7 @@
 
 using Microsoft.CommandPalette.Extensions;
 using Microsoft.CommandPalette.Extensions.Toolkit;
+using MsGamebarHandler;
 
 namespace MsGamebarHandlerExtension;
 
@@ -14,12 +15,13 @@ public partial class MsGamebarHandlerExtensionCommandsProvider : CommandProvider
 
     public MsGamebarHandlerExtensionCommandsProvider()
     {
-        DisplayName = "ms-gamebar-handler";
+        DisplayName = L.Get("AppName");
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
         _commands = [
             new CommandItem(new MsGamebarHandlerExtensionPage())
             {
                 Title = DisplayName,
+                Subtitle = "ms-gamebar-handler",
                 MoreCommands = [new CommandContextItem(_settingsManager.Settings.SettingsPage)],
             },
         ];

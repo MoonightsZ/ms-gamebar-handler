@@ -45,27 +45,27 @@ public static class RuleEditor
     public static void Validate(EventRule rule, HandlerConfig config)
     {
         if (rule is null || !Regex.IsMatch(rule.Id ?? "", @"^[A-Za-z0-9._-]{1,64}$"))
-            throw new InvalidDataException("規則 ID 須為 1–64 個英數、點、底線或連字號");
-        if (rule.CooldownSeconds is < 0 or > 86400) throw new InvalidDataException("冷卻時間須介於 0–86400 秒");
+            throw new InvalidDataException(L.Get("InvalidRuleId"));
+        if (rule.CooldownSeconds is < 0 or > 86400) throw new InvalidDataException(L.Get("InvalidCooldown"));
         if (rule.Match is null || !new[] { "any", "contains", "equals", "protocol", "regex" }.Contains(rule.Match.Type))
-            throw new InvalidDataException("未知的匹配類型");
+            throw new InvalidDataException(L.Get("UnknownMatchType"));
         if (rule.Match.Type != "any" && string.IsNullOrWhiteSpace(rule.Match.Value))
-            throw new InvalidDataException("匹配值不可為空");
+            throw new InvalidDataException(L.Get("EmptyMatchValue"));
         if (rule.Match.Type == "protocol" && !Protocols.Names.Contains(rule.Match.Value.TrimEnd(':'), StringComparer.OrdinalIgnoreCase))
-            throw new InvalidDataException("僅支援三個 Game Bar 協議");
+            throw new InvalidDataException(L.Get("OnlyGameBarProtocols"));
         if (rule.Match.Type == "regex")
         {
             try { _ = new Regex(rule.Match.Value, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(100)); }
-            catch (ArgumentException ex) { throw new InvalidDataException("正則表達式無效", ex); }
+            catch (ArgumentException ex) { throw new InvalidDataException(L.Get("InvalidRegex"), ex); }
         }
-        if (rule.Action is null) throw new InvalidDataException("缺少動作");
+        if (rule.Action is null) throw new InvalidDataException(L.Get("MissingAction"));
         HandlerConfig.ValidateAction(rule.Action, config.AllowRun, config.AllowedExecutables);
     }
 
     private static int Find(HandlerConfig config, string id)
     {
         var index = config.Events.FindIndex(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
-        if (index < 0) throw new KeyNotFoundException($"找不到規則：{id}");
+        if (index < 0) throw new KeyNotFoundException(L.Get("RuleNotFound", id));
         return index;
     }
 

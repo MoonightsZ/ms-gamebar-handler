@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppDisplayName" xml:space="preserve"><value>MS 游戏栏处理器</value></data>
+  <data name="AppDescription" xml:space="preserve"><value>处理 Game Bar 协议请求，避免反复出现选择应用弹窗。</value></data>
+</root>
