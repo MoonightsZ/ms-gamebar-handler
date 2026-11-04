@@ -1,5 +1,11 @@
 # Windows 11 測試帳戶驗收紀錄
 
+## 0.5.0.0 圖示、註解與事件併發（2026-11-04）
+
+- 七張 MSIX PNG 圖示已更換為同一套視窗輪廓圖案；檢查尺寸為 24、48、50、88、300、620×300、1240×600。
+- 原本三個協議連續觸發時只新增一筆事件，`errors.log` 出現分享衝突。新增檔案暫時占用重試測試後，三個 `LaunchUriAsync` 均回報成功，事件檔新增三筆，錯誤檔未增加。
+- 26 項自動測試通過。MSIX 建置 0 錯誤、1 項符號套件工具警告；簽章狀態 `Valid`。本機重新安裝 `0.5.0.0` 後，僅有一筆相同套件家族的安裝記錄。
+
 ## 0.2.6.0 手把彈窗修正（2026-11-04）
 
 - 舊版只在 HKCU 註冊 `shell\open\command`。`Start-Process 'ms-gamebar:'` 可觸發處理程式，但 `Windows.System.Launcher.QueryUriSupportAsync` 回報 `NotSupported`；使用者連接手把仍看到「取得打開此 ms-gamebar 鏈接的應用」。

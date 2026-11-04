@@ -9,6 +9,7 @@ public sealed record EventRule(string Id, bool Enabled, int CooldownSeconds, Mat
 
 public sealed class HandlerConfig
 {
+    // 首次執行時未必已有 config.json；預設配置讓協議請求直接靜默結束。
     public int Version { get; set; } = 1;
     public bool Log { get; set; } = true;
     public bool AllowRun { get; set; }
@@ -35,6 +36,7 @@ public sealed class HandlerConfig
 
     public static void ValidateAction(ActionRule action, bool allowRun, IReadOnlyCollection<string>? allowedExecutables = null)
     {
+        // 自訂動作須通過配置檢查，避免 URI 再次開啟 Game Bar 或任意執行本機程式。
         if (action.Type == "ignore") return;
         if (action.Type == "launch-uri" && Uri.TryCreate(action.Value, UriKind.Absolute, out var uri) && !Protocols.Names.Contains(uri.Scheme, StringComparer.OrdinalIgnoreCase)) return;
         if (action.Type == "run" && allowRun && Path.IsPathFullyQualified(action.Value) && File.Exists(action.Value)
@@ -53,6 +55,7 @@ public static class Protocols
 
 public static class Matcher
 {
+    // 第一條啟用且符合條件的規則生效；因此列表順序也是優先順序。
     public static EventRule? Select(HandlerConfig config, string url) => config.Events.FirstOrDefault(r => r.Enabled && IsMatch(r.Match, url));
 
     public static bool IsMatch(MatchRule rule, string url)

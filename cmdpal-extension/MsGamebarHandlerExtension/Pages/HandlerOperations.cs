@@ -34,6 +34,7 @@ internal static class HandlerOperations
 
     public static string Install()
     {
+        // MSIX 安裝時已註冊協議；這裡只準備可由使用者直接執行的管理工具。
         Directory.CreateDirectory(Bin);
         foreach (var name in new[] { "ms-gamebar-handler.exe", "ms-gamebar-handler-cli.exe" })
         {
@@ -47,6 +48,7 @@ internal static class HandlerOperations
 
     public static string RestoreLegacyRegistration()
     {
+        // 清除舊版手動登錄不會移除 MSIX。要停止接管協議須從 Windows 設定卸載套件。
         if (!File.Exists(Path.Combine(Data, "registry-backup.json"))) return "沒有舊版手動註冊需要還原";
         RunCli("--unregister");
         return "已還原舊版手動註冊；MSIX 仍在處理協議";
@@ -75,6 +77,7 @@ internal static class HandlerOperations
 
     private static string RunCli(params string[] arguments)
     {
+        // 使用 ArgumentList 傳參數，避免自己拼接命令列時把引號或空白處理錯。
         if (!File.Exists(Cli)) throw new FileNotFoundException("尚未安裝管理工具", Cli);
         var start = new ProcessStartInfo(Cli) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardError = true, RedirectStandardOutput = true };
         foreach (var argument in arguments) start.ArgumentList.Add(argument);

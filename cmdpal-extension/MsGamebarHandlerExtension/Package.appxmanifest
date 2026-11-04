@@ -13,7 +13,7 @@
   <Identity
     Name="MsGamebarHandlerExtension"
     Publisher="CN=ms-gamebar-handler-dev"
-    Version="0.2.6.0" />
+    Version="0.5.0.0" />
   <!-- When you're ready to publish your extension, you'll need to change the
        Publisher= to match your own identity -->
 
@@ -61,6 +61,7 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
+        <!-- Windows 透過套件清單發現協議處理程式；本機測試中，只寫 HKCU shell\open\command 無法涵蓋手把觸發的 URI 查詢。 -->
         <uap3:Extension Category="windows.protocol" Executable="Payload\ms-gamebar-handler.exe" EntryPoint="Windows.FullTrustApplication">
           <uap3:Protocol Name="ms-gamebar" Parameters="--invoke &quot;%1&quot;" />
         </uap3:Extension>

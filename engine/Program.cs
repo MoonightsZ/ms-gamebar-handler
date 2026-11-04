@@ -9,6 +9,7 @@ try
     var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ms-gamebar-handler");
     var configPath = Path.Combine(root, "config.json");
     var registry = new ProtocolRegistry(root);
+    // MSIX 的 windows.protocol 宣告會以 --invoke 傳入 URI；其他命令供管理工具與原始碼測試使用。
     switch (args[0])
     {
         case "--init":
@@ -45,6 +46,7 @@ try
             foreach (var line in registry.Status()) Console.WriteLine(line);
             return 0;
         case "--register":
+            // 傳統登錄方式只供原始碼部署使用。正式 MSIX 的協議關聯由套件清單管理。
             #if MANAGEMENT_CLI
             var executable = Path.Combine(AppContext.BaseDirectory, "ms-gamebar-handler.exe");
             #else
@@ -56,8 +58,10 @@ try
             return 0;
         case "--unregister": registry.Unregister(); Console.WriteLine("已還原三個協議"); return 0;
         case "--invoke" or "--test":
+            // URI 可能來自任何應用，先限制為本專案支援的三個協議，再讀取配置。
             if (args.Length != 2 || !Protocols.IsSupported(args[1])) { Console.Error.WriteLine("僅接受三個 Game Bar 協議的 URI"); return 2; }
             var config = HandlerConfig.Load(configPath);
+            // 規則依列表順序比對；沒有命中時使用 defaultAction（預設靜默忽略）。
             var rule = Matcher.Select(config, args[1]);
             var action = rule?.Action ?? config.DefaultAction;
             if (args[0] == "--test") { Console.WriteLine($"規則：{rule?.Id ?? "default"}；動作：{action.Type}"); return 0; }
@@ -65,6 +69,7 @@ try
             var statePath = Path.Combine(root, "state.json");
             var state = File.Exists(statePath) ? JsonSerializer.Deserialize<Dictionary<string, DateTimeOffset>>(File.ReadAllText(statePath)) ?? [] : new Dictionary<string, DateTimeOffset>();
             var now = DateTimeOffset.UtcNow;
+            // 冷卻期避免同一次手把連接在短時間內重複執行動作。
             var cooled = Cooldown.IsActive(rule, state, now);
             if (!cooled)
             {
@@ -76,7 +81,8 @@ try
                     File.WriteAllText(statePath, JsonSerializer.Serialize(state, HandlerConfig.JsonOptions));
                 }
             }
-            if (config.Log) File.AppendAllText(Path.Combine(root, "events.log"), $"{now:O} protocol={new Uri(args[1]).Scheme} rule={rule?.Id ?? "default"} action={(cooled ? "cooldown" : action.Type)}{Environment.NewLine}");
+            // 只記協議、規則與動作，不保存可能含使用者資料的完整 URI。
+            if (config.Log) EventLog.Append(Path.Combine(root, "events.log"), $"{now:O} protocol={new Uri(args[1]).Scheme} rule={rule?.Id ?? "default"} action={(cooled ? "cooldown" : action.Type)}{Environment.NewLine}");
             return 0;
         default: Console.Error.WriteLine("未知命令"); return 2;
     }

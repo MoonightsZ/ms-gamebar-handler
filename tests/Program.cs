@@ -79,6 +79,21 @@ finally
     if (Directory.Exists(dir)) Directory.Delete(dir, true);
 }
 
+var eventPath = Path.Combine(Path.GetTempPath(), $"ms-gamebar-events-{Guid.NewGuid():N}.log");
+try
+{
+    // 模擬手把一次送出多個協議時，另一個處理程序暫時占用事件檔。
+    using var held = new FileStream(eventPath, FileMode.Create, FileAccess.Write, FileShare.None);
+    var release = Task.Run(async () => { await Task.Delay(150); held.Dispose(); });
+    EventLog.Append(eventPath, "event-one" + Environment.NewLine);
+    release.GetAwaiter().GetResult();
+    Check("事件檔暫時占用後仍寫入", File.ReadAllText(eventPath) == "event-one" + Environment.NewLine);
+}
+finally
+{
+    if (File.Exists(eventPath)) File.Delete(eventPath);
+}
+
 return failures == 0 ? 0 : 1;
 
 static bool Throws(Action action)

@@ -1,6 +1,8 @@
 # ms-gamebar-handler
 
-让 Windows 接收游戏手柄或 `Win + G` 发出的 Game Bar 请求时，不再反复弹出“选择应用”窗口。启用处理程序后，这些请求默认被安静地忽略。项目通过 [PowerToys Command Palette](https://learn.microsoft.com/windows/powertoys/command-palette/overview) 提供操作入口。
+![ms-gamebar-handler 图标](cmdpal-extension/MsGamebarHandlerExtension/Assets/Square150x150Logo.scale-200.png)
+
+让 Windows 接收游戏手柄或 `Win + G` 发出的 Game Bar 请求时，不再反复弹出“选择应用”窗口。安装后，这些请求默认被安静地忽略。项目通过 [PowerToys Command Palette](https://learn.microsoft.com/windows/powertoys/command-palette/overview) 提供操作入口。
 
 > 当前是预览版，只支持 Windows x64。规则编辑和 Steam 大屏幕自动启动尚未开放。
 
@@ -58,3 +60,12 @@
 开发机已信任测试证书时，可以运行 `.\scripts\dev-deploy.ps1`，顺序完成 MSIX 构建、签名和当前用户升级；脚本会核对版本及套件身份，不会先卸载旧版。
 
 项目处理 `ms-gamebar:`、`ms-gamingoverlay:` 和 `ms-gamebarservices:`。默认不启动任何程序；事件记录存于 `%LOCALAPPDATA%\ms-gamebar-handler\events.log`，不保存完整请求地址。
+
+## 工作原理（接手项目时可先读这里）
+
+1. Windows 根据 MSIX 的 `Package.appxmanifest` 找到三个 Game Bar 协议。手柄或 `Win + G` 发出请求时，Windows 启动包内的 `ms-gamebar-handler.exe`，传入 `--invoke` 和请求地址。
+2. `engine/Program.cs` 先验证协议，再读取 `config.json`。没有配置文件时使用内置默认值：忽略请求，不启动别的程序。
+3. 若配置了规则，`engine/Rules.cs` 按列表顺序选中第一条匹配规则；冷却时间可避免短时间重复执行。当前 Command Palette 尚未开放规则编辑。
+4. 处理完成后，程序只把时间、协议名称、规则和动作写入 `events.log`。Command Palette 的“最近事件”读取这个文件。
+
+`engine/ProtocolRegistry.cs` 用于旧版手动注册及源码调试。正式 MSIX 的协议接管由清单完成；要完全停止接管，需要卸载 MSIX。图标可以用 `python scripts/generate-icons.py` 重新生成，运行该脚本需要 Pillow；安装包已经包含生成好的 PNG。

@@ -71,6 +71,7 @@ public static class RuleEditor
 
     private static void Write(string path, HandlerConfig config)
     {
+        // 先寫臨時檔再替換，避免儲存中斷後留下半份 config.json。
         var directory = Path.GetDirectoryName(Path.GetFullPath(path))!;
         Directory.CreateDirectory(directory);
         var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";

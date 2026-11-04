@@ -7,6 +7,7 @@ namespace MsGamebarHandler;
 [SupportedOSPlatform("windows")]
 public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = @"Software\Classes")
 {
+    // 此類別只管理舊版與原始碼部署的 HKCU 註冊；MSIX 協議宣告不經過這裡。
     private string BackupPath => Path.Combine(dataDirectory, "registry-backup.json");
 
     public IEnumerable<string> Status()
@@ -39,6 +40,7 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
         }
         else
         {
+            // 第一次寫入前備份三個協議，且拒絕覆蓋其他程式的處理命令。
             backup = [];
             foreach (var name in Protocols.Names)
             {
@@ -72,6 +74,7 @@ public sealed class ProtocolRegistry(string dataDirectory, string classesRoot = 
     {
         if (!File.Exists(BackupPath)) throw new InvalidOperationException("找不到原始註冊備份，拒絕解除註冊");
         var backup = ReadBackup();
+        // 若使用者或其他程式已改動命令，停止還原，避免刪掉別人的設定。
         foreach (var item in backup)
         {
             var current = ReadCommand(item.Name);
