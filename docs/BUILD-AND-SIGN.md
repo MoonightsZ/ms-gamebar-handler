@@ -10,7 +10,7 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 .\scripts\build-msix.ps1
 ```
 
-輸出位於 `dist\msix\MsGamebarHandlerExtension_0.0.5.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。
+輸出位於 `dist\msix\MsGamebarHandlerExtension_0.0.6.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
 
 ## 開發簽章
 
@@ -29,7 +29,7 @@ PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal �
 同一個 Windows 帳戶安裝較高版本時，直接執行 `Add-AppxPackage` 即可升級，毋須先解除安裝。升級要求新舊 MSIX 的套件家族名稱一致；本專案必須維持 `Identity Name="MsGamebarHandlerExtension"`、`Publisher="CN=ms-gamebar-handler-dev"`，並提高 `Version`。若換用正式簽章並變更 Publisher，Windows 會視為另一套件家族，需另行規劃遷移。參見 [Add-AppxPackage 官方說明](https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage)。
 
 ```powershell
-$package = 'C:\path\to\MsGamebarHandlerExtension_0.0.5.0_x64.msix'
+$package = 'C:\path\to\MsGamebarHandlerExtension_0.0.6.0_x64.msix'
 Add-AppxPackage -Path $package -ForceApplicationShutdown
 Get-AppxPackage -Name MsGamebarHandlerExtension |
     Select-Object Name, PackageFamilyName, Version, PackageFullName

@@ -1,5 +1,11 @@
 # Windows 11 測試帳戶驗收紀錄
 
+## 0.0.6.0 搜尋結果修正（2026-11-04）
+
+- 使用者截圖顯示舊名稱與兩筆新名稱結果。當前帳戶只安裝一個 MSIX；CmdPal `state.json` 含舊名稱與新名稱的歷史項目，Windows 開始功能表另有應用入口。
+- 套件的 `uap:VisualElements` 設為 `AppListEntry="none"`，使擴充套件只透過 CmdPal 擴充命令開啟。清理本機與此工具相關的歷史項目時保留其他命令的記錄。
+- 25 項自動測試通過；0.0.6.0 的 MSIX 建置、簽章及更新安裝成功。`Get-StartApps` 中此套件入口為 0；CmdPal 日誌顯示 0.0.6.0 擴充套件載入 1 個命令，快取中的名稱為 `ms-gamebar-handler`。搜尋結果的最終畫面仍待 UI 複核。
+
 ## 0.0.5.0 名稱與升級驗證（2026-11-04）
 
 - 對外顯示名稱改為 `ms-gamebar-handler`；MSIX `Identity Name` 與 `Publisher` 保持不變。

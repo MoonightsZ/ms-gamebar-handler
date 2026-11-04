@@ -13,7 +13,7 @@
   <Identity
     Name="MsGamebarHandlerExtension"
     Publisher="CN=ms-gamebar-handler-dev"
-    Version="0.0.5.0" />
+    Version="0.0.6.0" />
   <!-- When you're ready to publish your extension, you'll need to change the
        Publisher= to match your own identity -->
 
@@ -51,6 +51,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
+        AppListEntry="none"
         DisplayName="ms-gamebar-handler"
         Description="ms-gamebar-handler"
         BackgroundColor="transparent"
