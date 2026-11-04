@@ -12,7 +12,7 @@ internal sealed partial class MsGamebarHandlerExtensionPage : ListPage
     public MsGamebarHandlerExtensionPage()
     {
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
-        Title = "ms-gamebar Handler";
+        Title = "ms-gamebar-handler";
         Name = "管理 Game Bar 協議";
     }
 

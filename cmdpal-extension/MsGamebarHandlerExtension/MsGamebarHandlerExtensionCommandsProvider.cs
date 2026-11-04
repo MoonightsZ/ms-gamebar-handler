@@ -14,7 +14,7 @@ public partial class MsGamebarHandlerExtensionCommandsProvider : CommandProvider
 
     public MsGamebarHandlerExtensionCommandsProvider()
     {
-        DisplayName = "ms-gamebar Handler";
+        DisplayName = "ms-gamebar-handler";
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.png");
         _commands = [
             new CommandItem(new MsGamebarHandlerExtensionPage())

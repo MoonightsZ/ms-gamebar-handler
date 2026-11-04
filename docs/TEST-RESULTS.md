@@ -1,5 +1,12 @@
 # Windows 11 測試帳戶驗收紀錄
 
+## 0.0.5.0 名稱與升級驗證（2026-11-04）
+
+- 對外顯示名稱改為 `ms-gamebar-handler`；MSIX `Identity Name` 與 `Publisher` 保持不變。
+- 25 項自動測試通過；x64 MSIX 建置與簽章驗證通過。
+- 從 0.0.4.0 直接升級至 0.0.5.0 後，`PackageFamilyName` 均為 `MsGamebarHandlerExtension_t2xz08fyn448r`，目前帳戶只有一筆安裝記錄；開始功能表僅有一個 `ms-gamebar-handler` 入口。
+- Command Palette 中的新顯示名稱、安裝及解除安裝按鈕仍待逐項 UI 驗收。
+
 ## 0.0.4.0 介面調整（2026-11-04）
 
 - CmdPal 首頁只保留「安裝處理程式」「解除安裝處理程式」「最近事件」；配置、協議狀態及規則入口已隱藏。

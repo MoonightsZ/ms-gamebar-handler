@@ -1,4 +1,4 @@
-# ms-gamebar Handler：實施計畫
+# ms-gamebar-handler：實施計畫
 
 ## 目標與現況
 接管目前使用者的 `ms-gamebar`、`ms-gamingoverlay`、`ms-gamebarservices` URI。預設靜默忽略；使用者可依規則開啟 URI 或程式。PowerToys Command Palette 擴充套件是後續管理入口，引擎須可獨立工作。此工作區起初為空，先前交接文件所述的 `GamebarBridge.cs` 原型不在此機器可存取的位置，因此以新專案實作。
