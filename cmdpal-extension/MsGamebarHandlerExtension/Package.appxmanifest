@@ -13,7 +13,7 @@
   <Identity
     Name="MsGamebarHandlerExtension"
     Publisher="CN=ms-gamebar-handler-dev"
-    Version="0.2.0.0" />
+    Version="0.2.6.0" />
   <!-- When you're ready to publish your extension, you'll need to change the
        Publisher= to match your own identity -->
 
@@ -61,6 +61,15 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
+        <uap3:Extension Category="windows.protocol" Executable="Payload\ms-gamebar-handler.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap3:Protocol Name="ms-gamebar" Parameters="--invoke &quot;%1&quot;" />
+        </uap3:Extension>
+        <uap3:Extension Category="windows.protocol" Executable="Payload\ms-gamebar-handler.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap3:Protocol Name="ms-gamingoverlay" Parameters="--invoke &quot;%1&quot;" />
+        </uap3:Extension>
+        <uap3:Extension Category="windows.protocol" Executable="Payload\ms-gamebar-handler.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap3:Protocol Name="ms-gamebarservices" Parameters="--invoke &quot;%1&quot;" />
+        </uap3:Extension>
         <com:Extension Category="windows.comServer">
           <com:ComServer>
             <com:ExeServer Executable="MsGamebarHandlerExtension.exe" Arguments="-RegisterProcessAsComServer" DisplayName="ms-gamebar-handler">

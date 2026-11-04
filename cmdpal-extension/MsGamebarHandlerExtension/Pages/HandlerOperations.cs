@@ -42,14 +42,14 @@ internal static class HandlerOperations
             File.Copy(source, Path.Combine(Bin, name), true);
         }
         RunCli("--init");
-        RunCli("--register");
-        return "已接管三個 Game Bar 協議";
+        return "管理工具已安裝；MSIX 已接管三個 Game Bar 協議";
     }
 
-    public static string Uninstall()
+    public static string RestoreLegacyRegistration()
     {
+        if (!File.Exists(Path.Combine(Data, "registry-backup.json"))) return "沒有舊版手動註冊需要還原";
         RunCli("--unregister");
-        return "已還原協議；配置與日誌保留";
+        return "已還原舊版手動註冊；MSIX 仍在處理協議";
     }
 
     public static IReadOnlyList<RuleView> ReadRules()

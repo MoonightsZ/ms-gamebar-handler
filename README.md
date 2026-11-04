@@ -23,24 +23,22 @@
 
 这个预览版使用测试证书签名。双击 `.cer` 文件，选择“安装证书”→“本地计算机”→“将所有的证书都放入下列存储”→“受信任人”，按 Windows 提示完成操作。然后双击 `.msix` 安装。信任测试证书会影响整台电脑；只对从本项目发行页下载且已核对的文件执行这一步。详细步骤见[建置与部署说明](docs/BUILD-AND-SIGN.md)。
 
-### 3. 启用处理程序
+### 3. 检查是否生效
 
-打开 Command Palette，搜索 **ms-gamebar-handler**，进入后选择“安裝處理程式”。这一步才会接管当前 Windows 用户的 Game Bar 请求；只安装 MSIX 还不会接管。
+安装 MSIX 后，Windows 就会把三个 Game Bar 协议交给处理程序；无需再点击启用按钮。按 `Win + G` 或重新连接手柄，检查是否还出现“选择应用”窗口。
 
-现在按 `Win + G` 或重新连接手柄，检查是否还出现“选择应用”窗口。需要查看触发记录时，在扩展中选择“最近事件”。
+打开 Command Palette，搜索 **ms-gamebar-handler**，进入后可选择“最近事件”查看触发记录。“安裝管理工具”只用于准备命令行工具和配置文件，不影响 MSIX 的协议接管。
 
-### 4. 停用或更新
+### 4. 移除或更新
 
-- 停用：在扩展中选择“解除安裝處理程式”，恢复安装前的协议状态。
-- 更新：从发行版页面下载较高版本的 MSIX，直接安装即可覆盖旧版。更新后完全退出并重新启动 Command Palette；如有需要，再在扩展中选择“安裝處理程式”。
+- 移除：如果以前使用过本项目的“安裝處理程式”，先在扩展中选择“還原舊版手動註冊”；然后在 Windows“设置 → 应用 → 已安装的应用”中卸载 **ms-gamebar-handler**。
+- 更新：从发行版页面下载较高版本的 MSIX，直接安装即可覆盖旧版。更新后完全退出并重新启动 Command Palette。
 
 扩展本身是一个独立的 Windows 安装包，和 PowerToys 配合使用，但不是 PowerToys 主程序的一部分。它没有单独的开始菜单入口，请从 Command Palette 打开。
 
 ## 常见问题
 
-**为什么还会弹出“选择应用”？** 确认已在扩展中执行“安裝處理程式”，而不只是安装了 MSIX。当前预览版的这个按钮仍在逐项界面验收中；如果操作失败，请参考下面的命令行安装方式，并在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)中附上错误信息。
-
-**安装时提示已有其他处理程序？** 项目不会覆盖其他应用已注册的同名协议。请先确认原应用的用途，再决定是否调整。
+**为什么还会弹出“选择应用”？** 请在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension`，确认已安装最新 MSIX，再断开并重新连接手柄。如果仍弹出，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)中附上 Windows 版本、扩展版本和弹窗截图。
 
 **每次更新都会新增一个应用吗？** 不会。保持相同套件身份的较高版本会更新已有安装。可在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension` 查看当前版本；正常情况下当前用户只会看到一个版本。
 
@@ -55,7 +53,7 @@
 .\scripts\install.ps1
 ```
 
-`install.ps1` 会将引擎复制到当前用户的 `%LOCALAPPDATA%\ms-gamebar-handler\bin`，并注册三个协议。需要恢复原状态时执行 `.\scripts\uninstall.ps1`。构建、签章与部署 MSIX 的步骤见[建置与部署说明](docs/BUILD-AND-SIGN.md)，自动测试运行 `dotnet run --project .\tests\HandlerTests.csproj`。
+`install.ps1` 会将引擎复制到当前用户的 `%LOCALAPPDATA%\ms-gamebar-handler\bin`，并注册三个传统 Windows 协议命令，供源码开发测试。要解决手柄触发的系统弹窗，仍须安装包含协议宣告的 MSIX。需要恢复手动注册的原状态时执行 `.\scripts\uninstall.ps1`。构建、签章与部署 MSIX 的步骤见[建置与部署说明](docs/BUILD-AND-SIGN.md)，自动测试运行 `dotnet run --project .\tests\HandlerTests.csproj`。
 
 开发机已信任测试证书时，可以运行 `.\scripts\dev-deploy.ps1`，顺序完成 MSIX 构建、签名和当前用户升级；脚本会核对版本及套件身份，不会先卸载旧版。
 

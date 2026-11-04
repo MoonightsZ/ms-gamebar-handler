@@ -1,5 +1,13 @@
 # Windows 11 測試帳戶驗收紀錄
 
+## 0.2.6.0 手把彈窗修正（2026-11-04）
+
+- 舊版只在 HKCU 註冊 `shell\open\command`。`Start-Process 'ms-gamebar:'` 可觸發處理程式，但 `Windows.System.Launcher.QueryUriSupportAsync` 回報 `NotSupported`；使用者連接手把仍看到「取得打開此 ms-gamebar 鏈接的應用」。
+- 參考兩個社群專案的傳統登錄方式後，改由 MSIX 清單宣告三個 `windows.protocol`，直接啟動套件內的處理程式。測試帳戶升級後，使用者確認重新連接手把不再出現彈窗。
+- 在最終 0.2.6.0 套件中，三個協議的 `QueryUriSupportAsync` 均為 `Available`，`LaunchUriAsync` 均為 `True`，`events.log` 各新增一筆預設忽略事件。還原舊版 HKCU 手動註冊後，再測三個協議仍均可啟動並記錄事件。
+- 開發機舊版 `events.log` 曾出現寫入視圖不一致；重新建立檔案後已可記錄 MSIX 協議啟動事件，原有記錄保留。
+- 25 項自動測試通過；MSIX 建置 0 錯誤、3 項既有警告，簽章為 `Valid`；目前使用者僅安裝一筆 0.2.6.0，套件家族名稱保持 `MsGamebarHandlerExtension_t2xz08fyn448r`。
+
 ## 升級後搜尋結果重複（2026-11-04）
 
 - 使用者截圖顯示兩筆同名的 CmdPal 搜尋結果；系統只有一筆 `MsGamebarHandlerExtension` 0.2.0.0 安裝記錄，開始功能表沒有此套件入口。

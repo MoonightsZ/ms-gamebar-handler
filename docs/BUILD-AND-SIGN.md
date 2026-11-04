@@ -10,7 +10,7 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 .\scripts\build-msix.ps1
 ```
 
-輸出位於 `dist\msix\MsGamebarHandlerExtension_0.2.0.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
+輸出位於 `dist\msix\MsGamebarHandlerExtension_<版本>_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette` 及三個 `windows.protocol`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
 
 ## 開發簽章
 
@@ -24,12 +24,12 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 
 ## 安裝與升級
 
-PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal 透過套件清單發現它。擴充套件首頁的「安裝處理程式」只部署協議引擎並註冊三個協議，不負責安裝或升級 MSIX。參見[使用者提供的微軟擴充套件文件](https://aka.ms/building-cmdpal-extensions)。開發時也可依[微軟的擴充套件入門文件](https://learn.microsoft.com/en-us/windows/powertoys/command-palette/creating-an-extension)在 Visual Studio 使用 **Deploy**，再於 CmdPal 執行 **Reload Command Palette Extension**；單純 Build 不會更新已部署套件。
+PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal 透過套件清單發現它。安裝 MSIX 便會註冊三個協議，並以套件內的引擎處理 URI。首頁的「安裝管理工具」只複製命令列工具並初始化配置；「還原舊版手動註冊」只清理舊版 HKCU 登錄設定。參見[微軟的協議擴充文件](https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-extensions)與[使用者提供的擴充套件文件](https://aka.ms/building-cmdpal-extensions)。開發時也可依[微軟的擴充套件入門文件](https://learn.microsoft.com/en-us/windows/powertoys/command-palette/creating-an-extension)在 Visual Studio 使用 **Deploy**，再於 CmdPal 執行 **Reload Command Palette Extension**；單純 Build 不會更新已部署套件。
 
 同一個 Windows 帳戶安裝較高版本時，直接執行 `Add-AppxPackage` 即可升級，毋須先解除安裝。升級要求新舊 MSIX 的套件家族名稱一致；本專案必須維持 `Identity Name="MsGamebarHandlerExtension"`、`Publisher="CN=ms-gamebar-handler-dev"`，並提高 `Version`。若換用正式簽章並變更 Publisher，Windows 會視為另一套件家族，需另行規劃遷移。參見 [Add-AppxPackage 官方說明](https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage)。
 
 ```powershell
-$package = 'C:\path\to\MsGamebarHandlerExtension_0.2.0.0_x64.msix'
+$package = 'C:\path\to\MsGamebarHandlerExtension_0.2.6.0_x64.msix'
 Add-AppxPackage -Path $package -ForceApplicationShutdown
 Get-AppxPackage -Name MsGamebarHandlerExtension |
     Select-Object Name, PackageFamilyName, Version, PackageFullName
@@ -42,8 +42,8 @@ Get-AppxPackage -Name MsGamebarHandlerExtension |
 ## 實機驗收
 
 1. 在有 PowerToys Command Palette 的目標帳戶安裝已簽章 MSIX，重新載入 CmdPal，確認可找到 **ms-gamebar-handler**。
-2. 在擴充套件中執行安裝，確認三個 HKCU 協議命令指向 `%LOCALAPPDATA%\ms-gamebar-handler\bin\ms-gamebar-handler.exe`。
+2. 確認 MSIX 清單含三個 `windows.protocol` 宣告；不需要另行執行手動註冊。
 3. 連接手把及按 Win+G，確認不再出現「選擇應用程式」對話框，並查看最近事件。
-4. 執行解除安裝，確認三個協議回到原有狀態。
+4. 若有舊版手動註冊，執行「還原舊版手動註冊」並確認登錄設定恢復；要移除協議接管，從 Windows 設定卸載 MSIX。
 
-套件宣告 `unvirtualizedResources`，讓 CmdPal 寫入的引擎檔案、配置及三個 HKCU 協議命令可被套件外的 Windows Shell 存取。CmdPal 首版只顯示安裝、解除安裝與最近事件；規則管理暫不開放。先前已驗證三協議 Shell 呼叫，以及使用者手動觸發無彈窗。新版 CmdPal 按鈕仍待 UI 驗收，詳見 [驗收紀錄](TEST-RESULTS.md)。
+套件宣告 `unvirtualizedResources`，讓 CmdPal 與套件內引擎存取使用者配置和事件記錄。CmdPal 首版只顯示安裝管理工具、還原舊版手動註冊與最近事件；規則管理暫不開放。實機驗收結果見 [驗收紀錄](TEST-RESULTS.md)。
