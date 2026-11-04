@@ -30,6 +30,8 @@ Partner Center 已保留產品 `9P2LHK1M4M0G`。清單使用商店分配的 `Ide
 
 ## 安裝與升級
 
+測試憑證導入腳本會在驗證簽章時暫時把提供的憑證加入目前使用者的受信任根存放區，驗證完成後立即還原原狀；驗證通過才會將公開憑證導入本機的 `TrustedPeople`。這處理了首次安裝時因憑證尚未受信任而無法先驗證簽章的情況。
+
 PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal 透過套件清單發現它。安裝 MSIX 便會註冊三個協議，並以套件內的引擎處理 URI。首頁的「安裝管理工具」只複製命令列工具並初始化配置；「還原舊版手動註冊」只清理舊版 HKCU 登錄設定。參見[微軟的協議擴充文件](https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/desktop-to-uwp-extensions)與[使用者提供的擴充套件文件](https://aka.ms/building-cmdpal-extensions)。開發時也可依[微軟的擴充套件入門文件](https://learn.microsoft.com/en-us/windows/powertoys/command-palette/creating-an-extension)在 Visual Studio 使用 **Deploy**，再於 CmdPal 執行 **Reload Command Palette Extension**；單純 Build 不會更新已部署套件。
 
 同一個 Windows 帳戶安裝較高版本時，直接執行 `Add-AppxPackage` 即可升級，毋須先解除安裝。升級要求新舊 MSIX 的套件家族名稱一致；從 0.7.0.0 起需維持新的商店 Name、Publisher，並提高 `Version`。**0.5.0 及更早的測試包使用舊套件家族，不能原地升級到商店版。**首次改用 0.7.0.0 或商店版前，先從 Windows「已安裝的應用」解除安裝舊測試包；使用者設定和事件紀錄保存在 `%LOCALAPPDATA%\ms-gamebar-handler`，卸載 MSIX 不會主動刪除它們。參見 [Add-AppxPackage 官方說明](https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage)。

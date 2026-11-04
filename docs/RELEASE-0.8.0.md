@@ -5,3 +5,5 @@
 MSIX 清單的應用名稱和說明也提供三種語言，包內 `resources.pri` 包含全部翻譯。此版本使用單一 x64 MSIX，避免語言資源包在建置時遺漏。套件版本為 `0.8.0.0`，沿用 0.7.0 起的 Microsoft Store 套件家族，不改變三個 Game Bar 協議的處理方式。
 
 商店上架文案見 [STORE-LISTING.md](STORE-LISTING.md)；需在 Partner Center 分別填入對應語言的商店頁面。規則管理與 Steam 大螢幕自動啟動仍未開放。
+
+本版發行頁另提供以自簽測試憑證簽章的 MSIX、公開憑證及 SHA-256 清單，供商店上架前測試。下載後先核對雜湊，再依 [README](../README.md) 信任測試憑證並安裝。發行頁的測試簽章包與供 Partner Center 提交的未簽章包是兩個獨立檔案；請勿上傳測試簽章包作為商店提交產物。
