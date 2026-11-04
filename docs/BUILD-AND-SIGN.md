@@ -37,7 +37,7 @@ Get-AppxPackage -Name MsGamebarHandlerExtension |
 
 安裝後應只有一筆 `MsGamebarHandlerExtension`，其中 `PackageFamilyName` 保持不變、`Version` 更新。`Get-StartApps | Where-Object Name -like '*gamebar*'` 可檢查開始功能表入口。如看到多筆同名應用，先比較各筆的 `PackageFamilyName`；不要僅憑安裝視窗再次顯示「安裝」判定為新應用。
 
-在已信任測試憑證的開發機，可執行 `scripts\dev-deploy.ps1` 順序完成建置、簽章與當前使用者更新。腳本會比對專案及 MSIX 清單版本，並檢查更新後套件家族名稱與安裝數量；更新時直接使用 `Add-AppxPackage`，不先卸載舊版本。部署後在 Command Palette 執行 `Reload Command Palette Extension`。微軟的[擴充套件入門文件](https://learn.microsoft.com/zh-cn/windows/powertoys/command-palette/creating-an-extension)亦指出，單純建置不會更新已部署套件，修改後須重新部署並手動重新載入。這一流程參考 [Home Assistant Command Palette](https://github.com/nickknissen/HomeAssistantCommandPalette) 的本機部署腳本；發行與安裝文件的分層參考 [Process Killer for CmdPal](https://github.com/8LWXpg/CmdPal-ProcessKiller)。
+在已信任測試憑證的開發機，可執行 `scripts\dev-deploy.ps1` 順序完成建置、簽章與當前使用者更新。腳本會比對專案及 MSIX 清單版本，並檢查更新後套件家族名稱與安裝數量；更新時直接使用 `Add-AppxPackage`，不先卸載舊版本。升級後請完全退出並重新啟動 Command Palette，避免舊版命令仍留在執行中的搜尋結果。微軟的[擴充套件入門文件](https://learn.microsoft.com/zh-cn/windows/powertoys/command-palette/creating-an-extension)亦指出，單純建置不會更新已部署套件，修改後須重新部署並手動重新載入；本機實測顯示升級 MSIX 後完整重啟才能清除舊命令。這一流程參考 [Home Assistant Command Palette](https://github.com/nickknissen/HomeAssistantCommandPalette) 的本機部署腳本；發行與安裝文件的分層參考 [Process Killer for CmdPal](https://github.com/8LWXpg/CmdPal-ProcessKiller)。
 
 ## 實機驗收
 

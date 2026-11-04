@@ -31,4 +31,4 @@ if ($before.Count -eq 1 -and $before[0].PackageFamilyName -ne $after[0].PackageF
     throw '套件家族名稱改變，無法視為升級'
 }
 Write-Output "已部署：$($after[0].PackageFullName)"
-Write-Output '請在 Command Palette 執行 Reload Command Palette Extension，以重新載入擴充套件。'
+Write-Output '請完全退出並重新啟動 Command Palette，以清除升級前仍保留在記憶體中的命令。'

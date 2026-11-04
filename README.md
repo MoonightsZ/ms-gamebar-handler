@@ -32,7 +32,7 @@
 ### 4. 停用或更新
 
 - 停用：在扩展中选择“解除安裝處理程式”，恢复安装前的协议状态。
-- 更新：从发行版页面下载较高版本的 MSIX，直接安装即可覆盖旧版。更新后如有需要，在扩展中再次选择“安裝處理程式”。
+- 更新：从发行版页面下载较高版本的 MSIX，直接安装即可覆盖旧版。更新后完全退出并重新启动 Command Palette；如有需要，再在扩展中选择“安裝處理程式”。
 
 扩展本身是一个独立的 Windows 安装包，和 PowerToys 配合使用，但不是 PowerToys 主程序的一部分。它没有单独的开始菜单入口，请从 Command Palette 打开。
 
@@ -44,7 +44,7 @@
 
 **每次更新都会新增一个应用吗？** 不会。保持相同套件身份的较高版本会更新已有安装。可在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension` 查看当前版本；正常情况下当前用户只会看到一个版本。
 
-**搜索时还看到旧名称？** 更新到 0.2.0 后重新打开 Command Palette。旧名称可能来自之前的使用记录；如果仍出现，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)反馈截图和版本号。
+**搜索时出现两个同名结果或旧名称？** 更新后请完全退出并重新启动 Command Palette。仅关闭搜索窗口，后台进程仍可能保留升级前的命令。如果重启后仍重复，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)反馈截图和版本号。
 
 ## 从源码构建（开发者）
 
