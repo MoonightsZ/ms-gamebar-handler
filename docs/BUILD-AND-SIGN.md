@@ -1,6 +1,6 @@
 # 建置、簽章與部署
 
-CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microsoft/PowerToys/tree/main/src/modules/cmdpal/ExtensionTemplate/TemplateCmdPalExtension) 為基礎，範本檔案及圖像保留 MIT 授權。目標為 Windows x64；引擎使用 .NET 8，擴充套件以 .NET 10 自包含發佈。
+CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microsoft/PowerToys/tree/main/src/modules/cmdpal/ExtensionTemplate/TemplateCmdPalExtension) 為基礎，範本檔案及圖像保留 MIT 授權。目標為 Windows x64；引擎與管理工具使用 .NET 8 自包含發佈，擴充套件以 .NET 10 自包含發佈。
 
 ## 建置
 
@@ -10,7 +10,7 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 .\scripts\build-msix.ps1
 ```
 
-輸出位於 `dist\msix\MsGamebarHandlerExtension_0.0.6.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
+輸出位於 `dist\msix\MsGamebarHandlerExtension_0.2.0.0_x64_Test\`。MSIX 內應有 `Payload\ms-gamebar-handler.exe`、`Payload\ms-gamebar-handler-cli.exe`，並在 `AppxManifest.xml` 中宣告 `com.microsoft.commandpalette`。擴充套件專用的 Windows 應用入口以 `AppListEntry="none"` 隱藏，避免與 CmdPal 擴充命令同時出現在搜尋結果。
 
 ## 開發簽章
 
@@ -29,13 +29,15 @@ PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal �
 同一個 Windows 帳戶安裝較高版本時，直接執行 `Add-AppxPackage` 即可升級，毋須先解除安裝。升級要求新舊 MSIX 的套件家族名稱一致；本專案必須維持 `Identity Name="MsGamebarHandlerExtension"`、`Publisher="CN=ms-gamebar-handler-dev"`，並提高 `Version`。若換用正式簽章並變更 Publisher，Windows 會視為另一套件家族，需另行規劃遷移。參見 [Add-AppxPackage 官方說明](https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage)。
 
 ```powershell
-$package = 'C:\path\to\MsGamebarHandlerExtension_0.0.6.0_x64.msix'
+$package = 'C:\path\to\MsGamebarHandlerExtension_0.2.0.0_x64.msix'
 Add-AppxPackage -Path $package -ForceApplicationShutdown
 Get-AppxPackage -Name MsGamebarHandlerExtension |
     Select-Object Name, PackageFamilyName, Version, PackageFullName
 ```
 
 安裝後應只有一筆 `MsGamebarHandlerExtension`，其中 `PackageFamilyName` 保持不變、`Version` 更新。`Get-StartApps | Where-Object Name -like '*gamebar*'` 可檢查開始功能表入口。如看到多筆同名應用，先比較各筆的 `PackageFamilyName`；不要僅憑安裝視窗再次顯示「安裝」判定為新應用。
+
+在已信任測試憑證的開發機，可執行 `scripts\dev-deploy.ps1` 順序完成建置、簽章與當前使用者更新。腳本會比對專案及 MSIX 清單版本，並檢查更新後套件家族名稱與安裝數量；更新時直接使用 `Add-AppxPackage`，不先卸載舊版本。部署後在 Command Palette 執行 `Reload Command Palette Extension`。微軟的[擴充套件入門文件](https://learn.microsoft.com/zh-cn/windows/powertoys/command-palette/creating-an-extension)亦指出，單純建置不會更新已部署套件，修改後須重新部署並手動重新載入。這一流程參考 [Home Assistant Command Palette](https://github.com/nickknissen/HomeAssistantCommandPalette) 的本機部署腳本；發行與安裝文件的分層參考 [Process Killer for CmdPal](https://github.com/8LWXpg/CmdPal-ProcessKiller)。
 
 ## 實機驗收
 

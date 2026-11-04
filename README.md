@@ -9,7 +9,7 @@
 ### 1. 准备环境
 
 - Windows 11 x64，以及已启用 Command Palette 的 [Microsoft PowerToys](https://learn.microsoft.com/windows/powertoys/install)。
-- [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)。它用于运行随扩展提供的管理工具；如果电脑已经安装，可跳过。
+- 当前预览包已包含运行所需的 .NET 组件，无需另外安装 .NET Runtime。
 
 ### 2. 下载并安装扩展
 
@@ -44,7 +44,7 @@
 
 **每次更新都会新增一个应用吗？** 不会。保持相同套件身份的较高版本会更新已有安装。可在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension` 查看当前版本；正常情况下当前用户只会看到一个版本。
 
-**搜索时还看到旧名称？** 更新到 0.0.6.0 后重新打开 Command Palette。旧名称可能来自之前的使用记录；如果仍出现，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)反馈截图和版本号。
+**搜索时还看到旧名称？** 更新到 0.2.0 后重新打开 Command Palette。旧名称可能来自之前的使用记录；如果仍出现，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)反馈截图和版本号。
 
 ## 从源码构建（开发者）
 
@@ -56,5 +56,7 @@
 ```
 
 `install.ps1` 会将引擎复制到当前用户的 `%LOCALAPPDATA%\ms-gamebar-handler\bin`，并注册三个协议。需要恢复原状态时执行 `.\scripts\uninstall.ps1`。构建、签章与部署 MSIX 的步骤见[建置与部署说明](docs/BUILD-AND-SIGN.md)，自动测试运行 `dotnet run --project .\tests\HandlerTests.csproj`。
+
+开发机已信任测试证书时，可以运行 `.\scripts\dev-deploy.ps1`，顺序完成 MSIX 构建、签名和当前用户升级；脚本会核对版本及套件身份，不会先卸载旧版。
 
 项目处理 `ms-gamebar:`、`ms-gamingoverlay:` 和 `ms-gamebarservices:`。默认不启动任何程序；事件记录存于 `%LOCALAPPDATA%\ms-gamebar-handler\events.log`，不保存完整请求地址。

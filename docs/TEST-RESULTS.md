@@ -1,5 +1,13 @@
 # Windows 11 測試帳戶驗收紀錄
 
+## 0.2.0.0 自包含安裝與部署流程（2026-11-04）
+
+- 參考 Process Killer 與 Home Assistant Command Palette 的發行和本機部署方式；本專案保留相同套件家族的直接升級流程。
+- 引擎與 CLI 均使用 .NET 8 自包含發佈；不需目標機另行安裝 .NET 8 Runtime。
+- `scripts/dev-deploy.ps1` 在測試帳戶完成建置、簽章與更新安裝；套件家族名稱仍為 `MsGamebarHandlerExtension_t2xz08fyn448r`，目前只有一筆 0.2.0.0 安裝記錄，開始功能表入口為 0。
+- 已簽章 MSIX 為約 73.5 MB，簽章狀態 `Valid`。獨立執行 CLI `--status` 成功，顯示三個協議指向原資料目錄中的處理程式。
+- 25 項自動測試通過；再次執行部署腳本時，腳本在建置前正確拒絕同版本重複部署。
+
 ## 0.0.6.0 搜尋結果修正（2026-11-04）
 
 - 使用者截圖顯示舊名稱與兩筆新名稱結果。當前帳戶只安裝一個 MSIX；CmdPal `state.json` 含舊名稱與新名稱的歷史項目，Windows 開始功能表另有應用入口。
