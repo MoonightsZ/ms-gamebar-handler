@@ -6,6 +6,8 @@
 
 > 当前是预览版，只支持 Windows x64。规则编辑和 Steam 大屏幕自动启动尚未开放。
 
+> 0.7.0 已采用 Microsoft Store 分配的正式包身份，正在准备商店提交。下方发行版页面中的 0.5.0 安装包仍使用旧测试身份；它不会自动升级为商店版。商店版上线后，先卸载旧测试包，再从商店安装。
+
 ## 快速开始
 
 ### 1. 准备环境
@@ -40,9 +42,9 @@
 
 ## 常见问题
 
-**为什么还会弹出“选择应用”？** 请在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension`，确认已安装最新 MSIX，再断开并重新连接手柄。如果仍弹出，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)中附上 Windows 版本、扩展版本和弹窗截图。
+**为什么还会弹出“选择应用”？** 0.5.0 及更早的测试版可在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension`；0.7.0 起执行 `Get-AppxPackage -Name Moonights.ms-gamebar-handler`，确认安装版本后再断开并重新连接手柄。如果仍弹出，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)中附上 Windows 版本、扩展版本和弹窗截图。
 
-**每次更新都会新增一个应用吗？** 不会。保持相同套件身份的较高版本会更新已有安装。可在 PowerShell 执行 `Get-AppxPackage -Name MsGamebarHandlerExtension` 查看当前版本；正常情况下当前用户只会看到一个版本。
+**每次更新都会新增一个应用吗？** 同一个包家族的较高版本会覆盖旧版。0.7.0 改用商店身份，与 0.5.0 及更早测试版属于不同包家族；首次切换时需卸载旧测试版。后续商店版本会沿用 0.7.0 的包家族。
 
 **搜索时出现两个同名结果或旧名称？** 更新后请完全退出并重新启动 Command Palette。仅关闭搜索窗口，后台进程仍可能保留升级前的命令。如果重启后仍重复，请在[项目 Issues](https://gitee.com/Moonights_gitee/ms-gamebar-handler/issues)反馈截图和版本号。
 

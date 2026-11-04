@@ -8,7 +8,7 @@ if (!$PackagePath) {
     $PackagePath = $package.FullName
 }
 $PackagePath = (Resolve-Path -LiteralPath $PackagePath).Path
-$subject = 'CN=ms-gamebar-handler-dev'
+$subject = 'CN=A70DFBBD-5B3C-41A7-BF72-66C10479A4CD'
 $cert = Get-ChildItem -Path 'Cert:\CurrentUser\My' | Where-Object { $_.Subject -eq $subject -and $_.HasPrivateKey -and $_.NotAfter -gt (Get-Date).AddDays(30) } | Sort-Object NotAfter -Descending | Select-Object -First 1
 if (!$cert) {
     $cert = New-SelfSignedCertificate -Type Custom -Subject $subject -KeyUsage DigitalSignature -KeyAlgorithm RSA -KeyLength 2048 -HashAlgorithm SHA256 -CertStoreLocation 'Cert:\CurrentUser\My' -TextExtension @('2.5.29.37={text}1.3.6.1.5.5.7.3.3', '2.5.29.19={text}')

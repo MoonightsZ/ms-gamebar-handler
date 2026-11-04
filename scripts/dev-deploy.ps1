@@ -6,6 +6,10 @@ $projectPath = Join-Path $projectRoot 'cmdpal-extension\MsGamebarHandlerExtensio
 [xml]$project = Get-Content -LiteralPath $projectPath -Raw -Encoding UTF8
 $identity = $manifest.Package.Identity
 $version = $identity.Version
+$legacy = @(Get-AppxPackage -Name MsGamebarHandlerExtension)
+if ($legacy.Count -gt 0) {
+    throw '偵測到舊版測試套件 MsGamebarHandlerExtension。新版 Store 身分屬於另一個套件家族；請先卸載舊套件，再執行開發部署。'
+}
 $projectVersions = @($project.Project.PropertyGroup | ForEach-Object { $_.AppxPackageVersion } | Where-Object { $_ })
 if ($projectVersions.Count -ne 1 -or $projectVersions[0] -ne $version) {
     throw 'MSIX 清單與專案版本不一致'
@@ -16,7 +20,8 @@ if ($before.Count -eq 1 -and [version]$before[0].Version -ge [version]$version) 
     throw "已安裝 $($before[0].Version)；請提高 MSIX 版本後再部署"
 }
 
-$packagePath = Join-Path $projectRoot "dist\msix\$($identity.Name)_${version}_x64_Test\$($identity.Name)_${version}_x64.msix"
+$projectName = [System.IO.Path]::GetFileNameWithoutExtension($projectPath)
+$packagePath = Join-Path $projectRoot "dist\msix\${projectName}_${version}_x64_Test\${projectName}_${version}_x64.msix"
 & (Join-Path $PSScriptRoot 'build-msix.ps1')
 if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $packagePath)) { throw 'MSIX 建置失敗' }
 & (Join-Path $PSScriptRoot 'sign-msix.ps1') -PackagePath $packagePath

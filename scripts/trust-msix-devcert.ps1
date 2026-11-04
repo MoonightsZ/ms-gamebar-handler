@@ -14,6 +14,6 @@ $signature = Get-AuthenticodeSignature -LiteralPath $PackagePath
 if ($signature.Status -ne 'Valid') { throw "套件簽章無效：$($signature.Status)" }
 $signer = $signature.SignerCertificate
 $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certificatePath)
-if (!$signer -or $signer.Thumbprint -ne $certificate.Thumbprint -or $certificate.Subject -ne 'CN=ms-gamebar-handler-dev') { throw '套件簽章與公開憑證不一致' }
+if (!$signer -or $signer.Thumbprint -ne $certificate.Thumbprint -or $certificate.Subject -ne 'CN=A70DFBBD-5B3C-41A7-BF72-66C10479A4CD') { throw '套件簽章與公開憑證不一致' }
 Import-Certificate -FilePath $certificatePath -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople' -ErrorAction Stop | Out-Null
 Write-Output "已信任測試憑證：$($certificate.Thumbprint)"

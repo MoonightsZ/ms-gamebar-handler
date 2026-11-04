@@ -11,11 +11,9 @@
   IgnorableNamespaces="uap uap3 desktop6 virtualization rescap">
 
   <Identity
-    Name="MsGamebarHandlerExtension"
-    Publisher="CN=ms-gamebar-handler-dev"
-    Version="0.5.0.0" />
-  <!-- When you're ready to publish your extension, you'll need to change the
-       Publisher= to match your own identity -->
+    Name="Moonights.ms-gamebar-handler"
+    Publisher="CN=A70DFBBD-5B3C-41A7-BF72-66C10479A4CD"
+    Version="0.7.0.0" />
 
   <Properties>
     <DisplayName>ms-gamebar-handler</DisplayName>
