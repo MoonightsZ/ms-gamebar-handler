@@ -1,9 +1,18 @@
+param([string]$PackagePath)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$packagePath = Join-Path $projectRoot 'dist\msix\MsGamebarHandlerExtension_0.0.1.0_x64_Test\MsGamebarHandlerExtension_0.0.1.0_x64.msix'
+$packageRoot = Join-Path $projectRoot 'dist\msix'
+if (!$PackagePath) {
+    $package = Get-ChildItem -LiteralPath $packageRoot -Recurse -Filter '*.msix' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if (!$package) { throw '找不到 MSIX；請先執行 scripts\build-msix.ps1' }
+    $PackagePath = $package.FullName
+}
+$PackagePath = (Resolve-Path -LiteralPath $PackagePath).Path
 $certificatePath = Join-Path $projectRoot 'dist\msix\ms-gamebar-handler-dev.cer'
-if (!(Test-Path -LiteralPath $packagePath) -or !(Test-Path -LiteralPath $certificatePath)) { throw '找不到已簽章套件或公開憑證' }
-$signer = (Get-AuthenticodeSignature -LiteralPath $packagePath).SignerCertificate
+if (!(Test-Path -LiteralPath $certificatePath)) { throw '找不到公開憑證' }
+$signature = Get-AuthenticodeSignature -LiteralPath $PackagePath
+if ($signature.Status -ne 'Valid') { throw "套件簽章無效：$($signature.Status)" }
+$signer = $signature.SignerCertificate
 $certificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certificatePath)
 if (!$signer -or $signer.Thumbprint -ne $certificate.Thumbprint -or $certificate.Subject -ne 'CN=ms-gamebar-handler-dev') { throw '套件簽章與公開憑證不一致' }
 Import-Certificate -FilePath $certificatePath -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople' -ErrorAction Stop | Out-Null

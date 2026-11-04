@@ -20,7 +20,22 @@ CmdPal 專案以 [PowerToys 官方擴充套件範本](https://github.com/microso
 .\scripts\sign-msix.ps1
 ```
 
-自簽憑證只適合測試。要在目標 Windows 裝置安裝，須先以系統管理員權限執行 `scripts\trust-msix-devcert.ps1`，核對套件與公開憑證後匯入 `Cert:\LocalMachine\TrustedPeople`，再以目標使用者執行 `Add-AppxPackage`；此步驟會變更目標裝置的信任存放區。正式發佈應換成符合發佈身分的簽章方式，並同步修改清單 Publisher。參見 [微軟的 MSIX 簽章指南](https://learn.microsoft.com/en-us/windows/msix/package/sign-msix-package-guide) 與 [安裝疑難排解](https://learn.microsoft.com/en-us/windows/msix/msix-troubleshooting-guide)。
+自簽憑證只適合測試。要在目標 Windows 裝置安裝，須先以系統管理員權限執行 `scripts\trust-msix-devcert.ps1 -PackagePath <MSIX 路徑>`，核對套件與公開憑證後匯入 `Cert:\LocalMachine\TrustedPeople`；省略路徑時會選擇 `dist\msix` 中最新建置的 MSIX。這會變更目標裝置的信任存放區。正式發佈應換成符合發佈身分的簽章方式，並同步修改清單 Publisher。參見 [微軟的 MSIX 簽章指南](https://learn.microsoft.com/en-us/windows/msix/package/sign-msix-package-guide) 與 [安裝疑難排解](https://learn.microsoft.com/en-us/windows/msix/msix-troubleshooting-guide)。
+
+## 安裝與升級
+
+PowerToys Command Palette 擴充套件本身是獨立的 MSIX 應用；CmdPal 透過套件清單發現它。擴充套件首頁的「安裝處理程式」只部署協議引擎並註冊三個協議，不負責安裝或升級 MSIX。參見[使用者提供的微軟擴充套件文件](https://aka.ms/building-cmdpal-extensions)。開發時也可依[微軟的擴充套件入門文件](https://learn.microsoft.com/en-us/windows/powertoys/command-palette/creating-an-extension)在 Visual Studio 使用 **Deploy**，再於 CmdPal 執行 **Reload Command Palette Extension**；單純 Build 不會更新已部署套件。
+
+同一個 Windows 帳戶安裝較高版本時，直接執行 `Add-AppxPackage` 即可升級，毋須先解除安裝。升級要求新舊 MSIX 的套件家族名稱一致；本專案必須維持 `Identity Name="MsGamebarHandlerExtension"`、`Publisher="CN=ms-gamebar-handler-dev"`，並提高 `Version`。若換用正式簽章並變更 Publisher，Windows 會視為另一套件家族，需另行規劃遷移。參見 [Add-AppxPackage 官方說明](https://learn.microsoft.com/en-us/powershell/module/appx/add-appxpackage)。
+
+```powershell
+$package = 'C:\path\to\MsGamebarHandlerExtension_0.0.4.0_x64.msix'
+Add-AppxPackage -Path $package -ForceApplicationShutdown
+Get-AppxPackage -Name MsGamebarHandlerExtension |
+    Select-Object Name, PackageFamilyName, Version, PackageFullName
+```
+
+安裝後應只有一筆 `MsGamebarHandlerExtension`，其中 `PackageFamilyName` 保持不變、`Version` 更新。`Get-StartApps | Where-Object Name -like '*gamebar*'` 可檢查開始功能表入口。如看到多筆同名應用，先比較各筆的 `PackageFamilyName`；不要僅憑安裝視窗再次顯示「安裝」判定為新應用。
 
 ## 實機驗收
 
