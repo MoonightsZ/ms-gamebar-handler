@@ -31,7 +31,6 @@ internal sealed partial class RuleFormContent : FormContent
         {
             ["rule"] = new JsonObject
             {
-                ["id"] = rule.Id,
                 ["enabled"] = rule.Enabled ? "true" : "false",
                 ["cooldown"] = rule.CooldownSeconds.ToString(CultureInfo.InvariantCulture),
                 ["matchType"] = rule.MatchType,
@@ -48,7 +47,6 @@ internal sealed partial class RuleFormContent : FormContent
               "type": "AdaptiveCard",
               "version": "1.6",
               "body": [
-                { "type": "Input.Text", "id": "id", "label": "規則 ID", "value": "${rule.id}", "isRequired": true },
                 { "type": "Input.Toggle", "id": "enabled", "title": "啟用", "value": "${rule.enabled}", "valueOn": "true", "valueOff": "false" },
                 { "type": "Input.Text", "id": "cooldown", "label": "冷卻秒數（0–86400）", "value": "${rule.cooldown}", "isRequired": true },
                 { "type": "Input.ChoiceSet", "id": "matchType", "label": "匹配方式", "style": "compact", "value": "${rule.matchType}", "choices": [
@@ -78,9 +76,7 @@ internal sealed partial class RuleFormContent : FormContent
         {
             var input = JsonNode.Parse(payload)?.AsObject() ?? throw new InvalidDataException("表單內容無效");
             string Value(string name) => input[name]?.ToString() ?? "";
-            var id = Value("id");
-            if (_originalId is not null && !string.Equals(id, _originalId, StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("修改規則 ID 請先刪除舊規則，再新增規則");
+            var id = _originalId ?? $"rule-{Guid.NewGuid():N}";
             if (!int.TryParse(Value("cooldown"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var cooldown))
                 throw new InvalidDataException("冷卻秒數須為整數");
             var rule = new RuleView(id, Value("enabled") == "true", cooldown, Value("matchType"), Value("matchValue"), Value("actionType"), Value("actionValue"), Value("arguments"));

@@ -52,27 +52,6 @@ internal static class HandlerOperations
         return "已還原協議；配置與日誌保留";
     }
 
-    public static string OpenConfig()
-    {
-        Directory.CreateDirectory(Data);
-        var path = Config;
-        if (!File.Exists(path))
-        {
-            File.WriteAllText(path, """
-                {
-                  "version": 1,
-                  "log": true,
-                  "allowRun": false,
-                  "allowedExecutables": [],
-                  "defaultAction": { "type": "ignore", "value": "", "arguments": "" },
-                  "events": []
-                }
-                """);
-        }
-        Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
-        return "已開啟配置";
-    }
-
     public static IReadOnlyList<RuleView> ReadRules()
     {
         if (!File.Exists(Config)) return [];
