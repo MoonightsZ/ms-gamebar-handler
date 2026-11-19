@@ -67,20 +67,13 @@ try
             if (args[0] == "--test") { Console.WriteLine(L.Get("TestResult", rule?.Id ?? "default", action.Type)); return 0; }
             Directory.CreateDirectory(root);
             var statePath = Path.Combine(root, "state.json");
-            var state = File.Exists(statePath) ? JsonSerializer.Deserialize<Dictionary<string, DateTimeOffset>>(File.ReadAllText(statePath)) ?? [] : new Dictionary<string, DateTimeOffset>();
             var now = DateTimeOffset.UtcNow;
-            // 冷卻期避免同一次手把連接在短時間內重複執行動作。
-            var cooled = Cooldown.IsActive(rule, state, now);
-            if (!cooled)
+            // 三個協議可同時啟動三個程序；冷卻檢查與動作必須共用跨程序鎖。
+            var cooled = CooldownState.Execute(statePath, rule, () =>
             {
                 if (action.Type == "launch-uri") Process.Start(new ProcessStartInfo(action.Value) { UseShellExecute = true });
                 if (action.Type == "run") Process.Start(new ProcessStartInfo(action.Value, action.Arguments) { UseShellExecute = false });
-                if (rule is not null && rule.CooldownSeconds > 0)
-                {
-                    state[rule.Id] = now;
-                    File.WriteAllText(statePath, JsonSerializer.Serialize(state, HandlerConfig.JsonOptions));
-                }
-            }
+            });
             // 只記協議、規則與動作，不保存可能含使用者資料的完整 URI。
             if (config.Log) EventLog.Append(Path.Combine(root, "events.log"), $"{now:O} protocol={new Uri(args[1]).Scheme} rule={rule?.Id ?? "default"} action={(cooled ? "cooldown" : action.Type)}{Environment.NewLine}");
             return 0;
@@ -94,7 +87,7 @@ catch (Exception ex)
     {
         var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ms-gamebar-handler");
         Directory.CreateDirectory(root);
-        File.AppendAllText(Path.Combine(root, "errors.log"), $"{DateTimeOffset.UtcNow:O} {ex.GetType().Name}: {ex.Message}{Environment.NewLine}");
+        EventLog.Append(Path.Combine(root, "errors.log"), $"{DateTimeOffset.UtcNow:O} {ex.GetType().Name}: {ex.Message}{Environment.NewLine}");
     }
     catch { }
     return 1;

@@ -29,6 +29,26 @@ var timed = new EventRule("timed", true, 15, new MatchRule("any", ""), new Actio
 var now = DateTimeOffset.UtcNow;
 Check("冷卻期內跳過", Cooldown.IsActive(timed, new Dictionary<string, DateTimeOffset> { ["timed"] = now.AddSeconds(-5) }, now));
 Check("冷卻期滿可執行", !Cooldown.IsActive(timed, new Dictionary<string, DateTimeOffset> { ["timed"] = now.AddSeconds(-15) }, now));
+var statePath = Path.Combine(Path.GetTempPath(), "ms-gamebar-handler-tests", Guid.NewGuid().ToString("N"), "state.json");
+try
+{
+    var launches = 0;
+    using var start = new ManualResetEventSlim(false);
+    var invocations = Enumerable.Range(0, 12).Select(_ => Task.Run(() =>
+    {
+        start.Wait();
+        return CooldownState.Execute(statePath, timed, () => Interlocked.Increment(ref launches));
+    })).ToArray();
+    start.Set();
+    Task.WaitAll(invocations);
+    Check("併發協議只執行一次冷卻動作", launches == 1 && invocations.Count(task => task.Result) == 11);
+    Check("冷卻狀態保持有效 JSON", System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, DateTimeOffset>>(File.ReadAllText(statePath))?.ContainsKey("timed") == true);
+}
+finally
+{
+    var dir = Path.GetDirectoryName(statePath)!;
+    if (Directory.Exists(dir)) Directory.Delete(dir, true);
+}
 Check("不允許遞迴開啟 Game Bar URI", Throws(() => HandlerConfig.ValidateAction(new ActionRule("launch-uri", "ms-gamebar://x", ""), false)));
 Check("預設拒絕執行程式", Throws(() => HandlerConfig.ValidateAction(new ActionRule("run", Environment.ProcessPath!, ""), false)));
 Check("開啟執行權限仍須白名單", Throws(() => HandlerConfig.ValidateAction(new ActionRule("run", Environment.ProcessPath!, ""), true)));
